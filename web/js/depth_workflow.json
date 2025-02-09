@@ -159,13 +159,11 @@
   },
   "30": {
     "inputs": {
-      "base64_data": "",
-      "image_output": "Preview",
-      "save_prefix": "ComfyUI"
+      "base64_string": ""
     },
-    "class_type": "easy loadImageBase64",
+    "class_type": "ImageLoadFromBase64(IOHelpers)",
     "_meta": {
-      "title": "Load Image (Base64)"
+      "title": "ImageLoadFromBase64(IOHelpers)"
     }
   },
   "31": {

@@ -79,7 +79,7 @@
 
     // Generate a random seed for the KSampler node ("class_type": "KSampler") to ensure variability in the image generation process
     // Note: After changing the model, ensure to find the correct model node and check if a seed value needs to be set
-    workflow['30']['inputs']['base64_data'] = document.getElementById('uploaded-image').src;
+    workflow['30']['inputs']['base64_string'] = document.getElementById('uploaded-image').src;
     
     const data = { prompt: workflow, client_id: clientId }
     
