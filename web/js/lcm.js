@@ -20,10 +20,15 @@
   socket.addEventListener('open', () => console.log('Connected to the server'))
   socket.addEventListener('message', handleSocketMessage)
 
-  // Event listener for the button click
-  sendPromptButton.addEventListener('click', () => {
-    const promptText = promptElement.value
-    queuePromptWithText(promptText)
+  let debounceTimeout
+  promptElement.addEventListener('input', () => {
+    clearTimeout(debounceTimeout)
+    debounceTimeout = setTimeout(() => {
+      const promptText = promptElement.value
+      if (promptText.trim()) {
+        queuePromptWithText(promptText)
+      }
+    }, 200)
   })
 
   // Function to generate UUID
@@ -34,7 +39,7 @@
 
   // Function to load the workflow
   async function loadWorkflow() {
-    const response = await fetch('/comfygen/js/base_workflow.json')
+    const response = await fetch('/comfygen/js/LCM_workflow.json')
     return response.json()
   }
 

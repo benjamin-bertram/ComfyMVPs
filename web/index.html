@@ -1,18 +1,113 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ComfyGen Demo App</title>
   <link rel="stylesheet" type="text/css" href="/comfygen/css/comfygen.css">
+  <style>
+    .top-buttons {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .active {
+      background-color: blue;
+      color: white;
+    }
+    #drop-area {
+      border: 2px dashed #ccc;
+      padding: 20px;
+      text-align: center;
+      margin: 20px 0;
+    }
+    #uploaded-image {
+      display: none;
+      max-width: 256px;
+      margin: 20px 0;
+    }
+  </style>
 </head>
 <body>
+  <div class="top-buttons">
+    <button id="instantgen-btn">InstantGen</button>
+    <button id="copilot-btn">Copilot</button>
+    <button id="instantdepth-btn">InstantDepth</button>
+  </div>
   <main>
     <progress id="main-progress" class="progress" value="0" max="0"></progress>
     <textarea id="prompt" placeholder="Enter text here to generate an image..."></textarea>
     <button id="send-prompt-button">Generate Image</button>
+    <div id="drop-area" style="display: none;">Drag & Drop image here</div>
+    <!-- Uploaded image preview -->
+    <img id="uploaded-image" alt="Uploaded Image Preview">
+    <!-- Generated image display -->
     <img id="maingen" width="512" height="512" alt="Generated Image Placeholder" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
   </main>
-  <script src="/comfygen/js/app.js"></script>
+  <script>
+    function loadScript(src) {
+      const script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+    
+    function setActiveButton(clickedButton) {
+      document.querySelectorAll('.top-buttons button').forEach(btn => btn.classList.remove('active'));
+      clickedButton.classList.add('active');
+    }
+    
+    const dropArea = document.getElementById("drop-area");
+    const uploadedImage = document.getElementById("uploaded-image");
+    
+    dropArea.addEventListener("dragover", e => {
+      e.preventDefault();
+      dropArea.style.backgroundColor = "#eee";
+    });
+    
+    dropArea.addEventListener("dragleave", e => {
+      e.preventDefault();
+      dropArea.style.backgroundColor = "";
+    });
+    
+    dropArea.addEventListener("drop", e => {
+      e.preventDefault();
+      dropArea.style.backgroundColor = "";
+      const files = e.dataTransfer.files;
+      if (files.length > 0 && files[0].type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = event => {
+          uploadedImage.src = event.target.result;
+          uploadedImage.style.display = "block";
+        };
+        reader.readAsDataURL(files[0]);
+      }
+    });
+    
+    document.getElementById("instantgen-btn").addEventListener("click", function() {
+      setActiveButton(this);
+      loadScript("/comfygen/js/lcm.js");
+      document.getElementById("send-prompt-button").style.display = "none";
+      dropArea.style.display = "none";
+      uploadedImage.style.display = "none";
+    });
+    
+    document.getElementById("copilot-btn").addEventListener("click", function() {
+      setActiveButton(this);
+      loadScript("/comfygen/js/copilot.js");
+      document.getElementById("send-prompt-button").style.display = "block";
+      dropArea.style.display = "none";
+      uploadedImage.style.display = "none";
+    });
+    
+    document.getElementById("instantdepth-btn").addEventListener("click", function() {
+      setActiveButton(this);
+      loadScript("/comfygen/js/instantdepth.js");
+      document.getElementById("send-prompt-button").style.display = "none";
+      dropArea.style.display = "block";
+      // The uploaded image preview remains visible once an image is dropped
+    });
+  </script>
 </body>
 </html>
