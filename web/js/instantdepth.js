@@ -4,8 +4,7 @@
   const clientId = uuidv4()
   const socketUrl = `ws://${serverAddress}/ws?clientId=${clientId}`
   const workflow = await loadWorkflow()
-  const promptElement = document.getElementById('prompt')
-  const sendPromptButton = document.getElementById('send-prompt-button')
+  const promptElement = document.getElementById('instantdepth-prompt')
   const mainBuildElement = document.getElementById('maingen')
   const progressBar = document.getElementById('main-progress')
 
@@ -28,7 +27,7 @@
       if (promptText.trim()) {
         queuePromptWithText(promptText)
       }
-    }, 200)
+    }, 500)
   })
 
   // Function to generate UUID
@@ -80,7 +79,7 @@
 
     // Generate a random seed for the KSampler node ("class_type": "KSampler") to ensure variability in the image generation process
     // Note: After changing the model, ensure to find the correct model node and check if a seed value needs to be set
-    workflow['30']['inputs']['image'] = document.getElementById('uploaded-image').src;
+    workflow['30']['inputs']['base64_data'] = document.getElementById('uploaded-image').src;
     
     const data = { prompt: workflow, client_id: clientId }
     

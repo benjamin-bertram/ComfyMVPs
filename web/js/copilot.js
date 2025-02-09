@@ -4,7 +4,7 @@
   const clientId = uuidv4()
   const socketUrl = `ws://${serverAddress}/ws?clientId=${clientId}`
   const workflow = await loadWorkflow()
-  const promptElement = document.getElementById('prompt')
+  const promptElement = document.getElementById('copilot-prompt')
   const sendPromptButton = document.getElementById('send-prompt-button')
   const mainBuildElement = document.getElementById('maingen')
   const progressBar = document.getElementById('main-progress')

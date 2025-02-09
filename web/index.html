@@ -27,6 +27,12 @@
       max-width: 256px;
       margin: 20px 0;
     }
+    .prompt-field {
+      width: 100%;
+      height: 100px;
+      margin: 10px 0;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -37,25 +43,34 @@
   </div>
   <main>
     <progress id="main-progress" class="progress" value="0" max="0"></progress>
-    <textarea id="prompt" placeholder="Enter text here to generate an image..."></textarea>
-    <button id="send-prompt-button">Generate Image</button>
+    
+    <!-- Dedicated prompt fields -->
+    <textarea id="lcm-prompt" class="prompt-field" placeholder="Enter LCM prompt..."></textarea>
+    <textarea id="copilot-prompt" class="prompt-field" placeholder="Enter Copilot prompt..."></textarea>
+    <textarea id="instantdepth-prompt" class="prompt-field" placeholder="Enter InstantDepth prompt..."></textarea>
+    
+    <button id="send-prompt-button" style="display: none;">Generate Image</button>
     <div id="drop-area" style="display: none;">Drag & Drop image here</div>
-    <!-- Uploaded image preview -->
     <img id="uploaded-image" alt="Uploaded Image Preview">
-    <!-- Generated image display -->
     <img id="maingen" width="512" height="512" alt="Generated Image Placeholder" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
   </main>
   <script>
-    function loadScript(src) {
+    function loadScript(src, callback) {
       const script = document.createElement('script');
       script.src = src;
-      script.async = true;
+      script.onload = callback;
       document.body.appendChild(script);
     }
     
     function setActiveButton(clickedButton) {
       document.querySelectorAll('.top-buttons button').forEach(btn => btn.classList.remove('active'));
       clickedButton.classList.add('active');
+    }
+    
+    function hideAllPrompts() {
+      document.getElementById("lcm-prompt").style.display = "none";
+      document.getElementById("copilot-prompt").style.display = "none";
+      document.getElementById("instantdepth-prompt").style.display = "none";
     }
     
     const dropArea = document.getElementById("drop-area");
@@ -76,6 +91,18 @@
       dropArea.style.backgroundColor = "";
       const files = e.dataTransfer.files;
       if (files.length > 0 && files[0].type.startsWith("image/")) {
+        // POST the image to /upload/image/
+        const formData = new FormData();
+        formData.append('image', files[0]);
+        fetch('/upload/image/', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => console.log('Upload successful:', data))
+        .catch(error => console.error('Upload error:', error));
+        
+        // Preview the image
         const reader = new FileReader();
         reader.onload = event => {
           uploadedImage.src = event.target.result;
@@ -87,7 +114,11 @@
     
     document.getElementById("instantgen-btn").addEventListener("click", function() {
       setActiveButton(this);
-      loadScript("/comfygen/js/lcm.js");
+      hideAllPrompts();
+      document.getElementById("lcm-prompt").style.display = "block";
+      loadScript("/comfygen/js/lcm.js", function() {
+        if (typeof initInstantGen === "function") initInstantGen();
+      });
       document.getElementById("send-prompt-button").style.display = "none";
       dropArea.style.display = "none";
       uploadedImage.style.display = "none";
@@ -95,7 +126,11 @@
     
     document.getElementById("copilot-btn").addEventListener("click", function() {
       setActiveButton(this);
-      loadScript("/comfygen/js/copilot.js");
+      hideAllPrompts();
+      document.getElementById("copilot-prompt").style.display = "block";
+      loadScript("/comfygen/js/copilot.js", function() {
+        if (typeof initCopilot === "function") initCopilot();
+      });
       document.getElementById("send-prompt-button").style.display = "block";
       dropArea.style.display = "none";
       uploadedImage.style.display = "none";
@@ -103,10 +138,13 @@
     
     document.getElementById("instantdepth-btn").addEventListener("click", function() {
       setActiveButton(this);
-      loadScript("/comfygen/js/instantdepth.js");
+      hideAllPrompts();
+      document.getElementById("instantdepth-prompt").style.display = "block";
+      loadScript("/comfygen/js/instantdepth.js", function() {
+        if (typeof initInstantDepth === "function") initInstantDepth();
+      });
       document.getElementById("send-prompt-button").style.display = "none";
       dropArea.style.display = "block";
-      // The uploaded image preview remains visible once an image is dropped
     });
   </script>
 </body>

@@ -159,12 +159,13 @@
   },
   "30": {
     "inputs": {
-      "image": "Artboard 1we.jpg",
-      "upload": "image"
+      "base64_data": "",
+      "image_output": "Preview",
+      "save_prefix": "ComfyUI"
     },
-    "class_type": "LoadImage",
+    "class_type": "easy loadImageBase64",
     "_meta": {
-      "title": "Load Image"
+      "title": "Load Image (Base64)"
     }
   },
   "31": {

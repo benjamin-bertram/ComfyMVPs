@@ -4,7 +4,7 @@
       "seed": 63423992056382,
       "steps": 8,
       "cfg": 1.5,
-      "sampler_name": "LCM",
+      "sampler_name": "lcm",
       "scheduler": "normal",
       "denoise": 1,
       "model": [
